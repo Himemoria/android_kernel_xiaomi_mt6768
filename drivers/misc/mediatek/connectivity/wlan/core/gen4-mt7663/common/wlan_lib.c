@@ -7844,9 +7844,8 @@ uint32_t wlanCfgParse(IN struct ADAPTER *prAdapter,
 				       ppcArgs[0], ppcArgs[1], ucTmp);
 				wlanCfgParseAddEntry(prAdapter, ppcArgs[1],
 						     NULL, ucTmp, NULL);
-				kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
-				kalMemSet(apcArgv, 0,
-					WLAN_CFG_ARGV_MAX * sizeof(int8_t *));
+				kalMemSet(arcArgv_size, 0, sizeof(arcArgv_size));
+				kalMemSet(apcArgv, 0, sizeof(apcArgv));
 				i4Nargs = 0;
 				goto exit;
 
@@ -7907,9 +7906,14 @@ uint32_t wlanCfgParse(IN struct ADAPTER *prAdapter,
 				       ppcArgs[0], ppcArgs[1], ucTmp);
 				wlanCfgParseAddEntry(prAdapter, ppcArgs[1],
 						     NULL, ucTmp, NULL);
+<<<<<<< HEAD:drivers/misc/mediatek/connectivity/wlan/core/gen4-mt7663/common/wlan_lib.c
 				kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
 				kalMemSet(apcArgv, 0,
 					WLAN_CFG_ARGV_MAX * sizeof(int8_t *));
+=======
+				kalMemSet(arcArgv_size, 0, sizeof(arcArgv_size));
+				kalMemSet(apcArgv, 0, sizeof(apcArgv));
+>>>>>>> 6e7b418bb76f (drivers: mediatek-connectivity: fix compile failed using GCC 12):drivers/misc/mediatek/connectivity/wlan_drv_gen4m/common/wlan_lib.c
 				i4Nargs = 0;
 				break;
 
@@ -8009,9 +8013,14 @@ uint32_t wlanCfgParse(IN struct ADAPTER *prAdapter,
 			}
 
 #endif
+<<<<<<< HEAD:drivers/misc/mediatek/connectivity/wlan/core/gen4-mt7663/common/wlan_lib.c
 			kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
 			kalMemSet(apcArgv, 0,
 				WLAN_CFG_ARGV_MAX * sizeof(int8_t *));
+=======
+			kalMemSet(arcArgv_size, 0, sizeof(arcArgv_size));
+			kalMemSet(apcArgv, 0, sizeof(apcArgv));
+>>>>>>> 6e7b418bb76f (drivers: mediatek-connectivity: fix compile failed using GCC 12):drivers/misc/mediatek/connectivity/wlan_drv_gen4m/common/wlan_lib.c
 			i4Nargs = 0;
 			break;
 
