@@ -3500,7 +3500,7 @@ int swapcache_prepare(swp_entry_t entry)
 
 struct swap_info_struct *swp_swap_info(swp_entry_t entry)
 {
-	return swap_info[swp_type(entry)];
+        return swap_info[swp_type(entry)];
 }
 
 struct swap_info_struct *page_swap_info(struct page *page)

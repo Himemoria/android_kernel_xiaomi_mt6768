@@ -497,7 +497,7 @@ static inline int swap_readpage(struct page *page, bool do_poll)
 
 static inline struct swap_info_struct *swp_swap_info(swp_entry_t entry)
 {
-	return NULL;
+        return NULL;
 }
 
 #define swap_address_space(entry)		(NULL)
