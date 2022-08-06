@@ -75,19 +75,10 @@ fi
 export BOT_MSG_URL="https://api.telegram.org/bot$TG_TOKEN/sendMessage"
 
 tg_post_msg() {
-  curl -s -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
-	-d chat_id="$TG_CHAT_ID" \
-	-d "disable_web_page_preview=true" \
-	-d "parse_mode=html" \
-	-d text="$1"
-}
-
-tg_post_file() {
-  curl -F document=@$1 "https://api.telegram.org/bot$token/sendDocument" \
-	-F chat_id="$TG_CHAT_ID" \
-	-F "disable_web_page_preview=true" \
-	-F "parse_mode=html" \
-	-F caption="$2"
+  curl -s -X POST "$BOT_MSG_URL" -d chat_id="$TG_CHAT_ID" \
+  -d "disable_web_page_preview=true" \
+  -d "parse_mode=html" \
+  -d text="$1"
 
 }
 
@@ -106,7 +97,7 @@ tg_post_msg "
 <b>• Host Core Count</b> : <code>$PROCS</code>
 <b>• Compiler</b> : <code>${KBUILD_COMPILER_STRING}</code>
 <b>• Top Commit</b> : <code>${COMMIT_HEAD}</code>
-<b>##==============================##</b>
+<b>##=============================##</b>
 "
 
   MAKE+=(
@@ -166,14 +157,22 @@ tg_post_msg "
 - <code>${ZIP_NAME}</code>
 <b>##===========================##</b>
 "
-tg_post_file "${ZIP}" "$KBUILD_COMPILER_STRING"
+      curl -F document=@$ZIP "https://api.telegram.org/bot$TG_TOKEN/sendDocument" \
+        -F chat_id="$TG_CHAT_ID" \
+        -F "disable_web_page_preview=true" \
+        -F "parse_mode=html" \
+        -F caption="$KBUILD_COMPILER_STRING"
 }
 
 # Fin Error
 function finerr() {
     msg "##===== Sending-Error Log =====##"
     LOG=$(echo error.log)
-    tg_post_file "${LOG}" "❌ Build Failed. | For <b>${DEVICE_CODENAME}</b> | <b>${KBUILD_COMPILER_STRING}</b>"
+    curl -F document=@$LOG "https://api.telegram.org/bot$TG_TOKEN/sendDocument" \
+        -F chat_id="$TG_CHAT_ID" \
+        -F "disable_web_page_preview=true" \
+        -F "parse_mode=html" \
+        -F caption="❌ Build Failed. | For <b>${DEVICE_CODENAME}</b> | <b>${KBUILD_COMPILER_STRING}</b>"
     exit 1
 }
 
