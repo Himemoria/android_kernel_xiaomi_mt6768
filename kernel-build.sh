@@ -135,7 +135,7 @@ make -j$(nproc) ARCH=arm64 O=out \
 function push() {
     msg "|| Started Uploading ||"
     cd AnyKernel
-    ZIP_NAME=[$DATE2][$KERVER]$KERNEL_NAME[$DEVICE_CODENAME][R-OSS]-$HEADCOMMITID.zip
+    ZIP_NAME=$KERNEL_NAME-$DEVICE_CODENAME-R-OSS-$DATE.zip
     ZIP=$(echo *.zip)
     MD5CHECK=$(md5sum "${ZIP}" | cut -d' ' -f1)
     SHA1CHECK=$(sha1sum "${ZIP}" | cut -d' ' -f1)
@@ -173,7 +173,7 @@ function finerr() {
 function zipping() {
     msg "|| Started Zipping ||"
     cd AnyKernel || exit 1
-    zip -r9 [$DATE2][$KERVER]$KERNEL_NAME[$DEVICE_CODENAME][R-OSS]-$HEADCOMMITID.zip *
+    zip -r9 $KERNEL_NAME-$DEVICE_CODENAME-R-OSS-$DATE.zip *
     cd ..
 }
 compile
