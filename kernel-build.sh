@@ -17,7 +17,7 @@ GCC64_DIR=$(pwd)/GCC64
 GCC32_DIR=$(pwd)/GCC32
 
 # Main Declaration
-MODEL=Redmi Note 9
+MODEL="Redmi Note 9"
 DEVICE_CODENAME=merlin
 DEVICE_DEFCONFIG=merlin_defconfig
 AK3_BRANCH=merlin
@@ -26,13 +26,12 @@ export KBUILD_BUILD_USER=Himemori
 export KBUILD_BUILD_HOST=XZI-TEAM
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
-DATE2=$(date +"%m%d")
 START=$(date +"%s")
 DTB=$(pwd)/out/arch/arm64/boot/dts/mediatek/mt6768.dtb
 DTBO=$(pwd)/out/arch/arm64/boot/dtbo.img
 DISTRO=$(source /etc/os-release && echo "${NAME}")
 
-msg "|| Cloning GCC  ||"
+msg "##===== Cloning-Toolchain =====##"
 git clone --depth=1 https://github.com/cyberknight777/gcc-arm64 -b master $GCC64_DIR
 git clone --depth=1 https://github.com/cyberknight777/gcc-arm -b master $GCC32_DIR
 KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
@@ -43,7 +42,6 @@ KERVER=$(make kernelversion)
 
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
-HEADCOMMITID="$(git log --pretty=format:'%h' -n1)"
 HEADCOMMITMSG="$(git log --pretty=format:'%s' -n1)"
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TERM=xterm
@@ -82,9 +80,11 @@ tg_post_msg() {
 
 # Post Main Information
 tg_post_msg "
-<b>========= Roulette-Kernel =========</b>
-<b>• Date</b> : <code>$(TZ=Asia/Jakarta date)</code>
+<b>##==== Starting-Compilation ====##</b>
+<b>• Date</b> : <code>$DATE</code>
 <b>• Docker OS</b> : <code>$DISTRO</code>
+<b>• Device Name</b> : <code>$MODEL ($DEVICE_CODENAME)</code>
+<b>• Device Defconfig</b> : <code>$DEVICE_DEFCONFIG</code>
 <b>• Kernel Name</b> : <code>${KERNEL_NAME}</code>
 <b>• Kernel Version</b> : <code>${KERVER}</code>
 <b>• Builder Name</b> : <code>${KBUILD_BUILD_USER}</code>
@@ -93,7 +93,7 @@ tg_post_msg "
 <b>• Host Core Count</b> : <code>$PROCS</code>
 <b>• Compiler</b> : <code>${KBUILD_COMPILER_STRING}</code>
 <b>• Top Commit</b> : <code>${COMMIT_HEAD}</code>
-<b>=================================</b>
+<b>##=============================##</b>
 "
 
   MAKE+=(
@@ -110,14 +110,13 @@ tg_post_msg "
     HOSTAR=llvm-ar
     HOSTCC=gcc
     HOSTCXX=aarch64-elf-g++
-    CONFIG_DEBUG_SECTION_MISMATCH=y
 )
 
 # Compile
 compile(){
-msg "|| Started Compilation ||"
+msg "##===== Starting-Compilation =====##"
 make -j$(nproc) O=out ARCH=arm64 ${DEVICE_DEFCONFIG}
-make -j$(nproc) ARCH=arm64 O=out \
+make -j$(nproc) ARCH=arm64 O=out CONFIG_DEBUG_SECTION_MISMATCH=y \
          "${MAKE[@]}" 2>&1 | tee error.log
 
    if ! [ -a "$IMAGE" ]; then
@@ -133,14 +132,14 @@ make -j$(nproc) ARCH=arm64 O=out \
 
 # Push kernel to channel
 function push() {
-    msg "|| Started Uploading ||"
+    msg "##===== Starting-Upload =====##"
     cd AnyKernel
-    ZIP_NAME=[$DATE2][$KERVER]$KERNEL_NAME[$DEVICE_CODENAME][R-OSS]-$HEADCOMMITID.zip
+    ZIP_NAME=$KERVER-$KERNEL_NAME-R-OSS-$DATE.zip
     ZIP=$(echo *.zip)
     MD5CHECK=$(md5sum "${ZIP}" | cut -d' ' -f1)
     SHA1CHECK=$(sha1sum "${ZIP}" | cut -d' ' -f1)
 tg_post_msg "
-<b>=================================</b>
+<b>##===========================##</b>
 ✅ <b>Build Success</b>
 - <code>$((DIFF / 60)) minute(s) $((DIFF % 60)) second(s) </code>
 <b>• MD5 Checksum</b>
@@ -149,23 +148,24 @@ tg_post_msg "
 - <code>${SHA1CHECK}</code>
 <b>• Zip Name</b>
 - <code>${ZIP_NAME}</code>
-<b>=================================</b>
+<b>##===========================##</b>
 "
-
-    curl -F document=@$ZIP "https://api.telegram.org/bot$TG_TOKEN/sendDocument" \
+      curl -F document=@$ZIP "https://api.telegram.org/bot$TG_TOKEN/sendDocument" \
         -F chat_id="$TG_CHAT_ID" \
         -F "disable_web_page_preview=true" \
         -F "parse_mode=html" \
         -F caption="$KBUILD_COMPILER_STRING"
 }
+
 # Fin Error
 function finerr() {
+    msg "##===== Sending-Error Log =====##"
     LOG=$(echo error.log)
     curl -F document=@$LOG "https://api.telegram.org/bot$TG_TOKEN/sendDocument" \
         -F chat_id="$TG_CHAT_ID" \
         -F "disable_web_page_preview=true" \
         -F "parse_mode=html" \
-        -F caption="❌ Compilation Failed. | For <b>${DEVICE_CODENAME}</b> | <b>${KBUILD_COMPILER_STRING}</b>"
+        -F caption="❌ Build Failed. | For <b>${DEVICE_CODENAME}</b> | <b>${KBUILD_COMPILER_STRING}</b>"
     exit 1
 }
 
@@ -173,7 +173,7 @@ function finerr() {
 function zipping() {
     msg "|| Started Zipping ||"
     cd AnyKernel || exit 1
-    zip -r9 [$DATE2][$KERVER]$KERNEL_NAME[$DEVICE_CODENAME][R-OSS]-$HEADCOMMITID.zip *
+    zip -r9 $KERVER-$KERNEL_NAME-R-OSS-$DATE.zip *
     cd ..
 }
 compile
