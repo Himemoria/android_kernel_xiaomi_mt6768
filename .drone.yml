@@ -7,6 +7,7 @@ steps:
   - name: Kernel Pipeline
     image: panchajanya1999/archlinux:latest
     commands:
+      - pacman -Syu --needed --noconfirm inetutils bc cpio git
       - echo "LC_ALL=en_US.UTF-8" | sudo tee -a /etc/environment
       - echo "en_US.UTF-8 UTF-8" | sudo tee -a /etc/locale.gen
       - echo "LANG=en_US.UTF-8" | sudo tee -a /etc/locale.conf
